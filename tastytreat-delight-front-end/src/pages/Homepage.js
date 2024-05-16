@@ -1,24 +1,33 @@
 import React from 'react';
 import Button from '@mui/material/Button';
-
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 function HomePage() {
   return (
-    <div className="HomePage">
+    <Box textAlign="center" p={4}>
       <header>
-        <h1>Welcome to Tasty Treat Delights</h1>
+        <Typography variant="h4" gutterBottom>
+          Welcome to Tasty Treat Delights
+        </Typography>
       </header>
       <section>
-        <p>Explore our delicious treats and indulge your cravings!</p>
+        <Typography variant="body1" gutterBottom>
+          Explore our delicious treats and indulge your cravings!
+        </Typography>
         <Button variant="contained" color="primary">
           View Treats
         </Button>
       </section>
       <footer>
-        <p>© 2024 Tasty Treat Delights. All rights reserved.</p>
+        <Typography variant="body2" fontStyle="italic" mt={4}>
+          © 2024 Tasty Treat Delights. All rights reserved.
+        </Typography>
       </footer>
-    </div>
+    </Box>
   );
 }
 
 export default HomePage;
+
+
