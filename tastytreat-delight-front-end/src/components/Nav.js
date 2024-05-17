@@ -1,19 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button } from '@mui/material';
+import { Toolbar, Button } from '@mui/material';
 
 function Nav() {
   return (
-    <AppBar position="static">
-      <Toolbar style={{ justifyContent: 'flex-end' }}>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Tasty Treat Delights
-        </Typography>
-        <Button color="inherit" component={Link} to="/">Home</Button>
-        <Button color="inherit" component={Link} to="/product-catalog">Product Catalog</Button>
-        <Button color="inherit" component={Link} to="/checkout">Checkout</Button>
-      </Toolbar>
-    </AppBar>
+    <Toolbar className="flex justify-between">
+      <div className="space-x-4">
+        <Button color="inherit" component={Link} to="/" className="hover:text-gray-300">
+          Home
+        </Button>
+        <Button color="inherit" component={Link} to="/your-treats" className="hover:text-gray-300">
+          Your Treats
+        </Button>
+        <Button color="inherit" component={Link} to="/product-catalog" className="hover:text-gray-300">
+          Product Catalog
+        </Button>
+        <Button color="inherit" component={Link} to="/checkout" className="hover:text-gray-300">
+          Checkout
+        </Button>
+      </div>
+    </Toolbar>
   );
 }
 
