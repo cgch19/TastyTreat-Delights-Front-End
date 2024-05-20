@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Toolbar, Button } from '@mui/material';
 
-function Nav() {
+function Nav({ isLoggedIn, handleLogout }) {
   return (
     <Toolbar className="flex justify-between">
       <div className="space-x-4">
@@ -16,8 +16,29 @@ function Nav() {
           Product Catalog
         </Button>
         <Button color="inherit" component={Link} to="/checkout" className="hover:text-gray-300">
-          Checkout
+          Cart
         </Button>
+      </div>
+      <div>
+        {isLoggedIn ? (
+          <>
+            <Button color="inherit" component={Link} to="/add-product" className="hover:text-gray-300">
+              Add Product
+            </Button>
+            <Button color="inherit" onClick={handleLogout} className="hover:text-gray-300">
+              Logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button color="inherit" component={Link} to="/login" className="hover:text-gray-300">
+              Login
+            </Button>
+            <Button color="inherit" component={Link} to="/signup" className="hover:text-gray-300">
+              Sign Up
+            </Button>
+          </>
+        )}
       </div>
     </Toolbar>
   );

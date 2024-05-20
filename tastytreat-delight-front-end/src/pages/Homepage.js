@@ -16,7 +16,7 @@ function HomePage() {
         <Typography variant="body1" gutterBottom>
           Explore our delicious treats and indulge your cravings!
         </Typography>
-        {/* Link the button to the ProductCatalog */}
+
         <Link to="/product-catalog">
           <Button variant="contained" color="primary">
             View Treats

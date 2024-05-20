@@ -48,7 +48,7 @@ const presetTreats = [
     id: '7',
     productName: 'Caramel Brownies',
     productDescription: 'Decadent caramel brownies with a gooey caramel center.',
-    productPrice: 6.49,
+    productPrice: 4.49,
     productImage: 'https://www.recipetineats.com/wp-content/uploads/2015/08/Salted-Caramel-Stuffed-Brownies_7a-SQ.jpg'
   },
   {
@@ -58,9 +58,37 @@ const presetTreats = [
     productPrice: 7.99,
     productImage: 'https://preppykitchen.com/wp-content/uploads/2022/07/Red-Velvet-Recipe-Card-1a.jpg'
   },
+  {
+    id: '9',
+    productName: 'Pumpkin Pie',
+    productDescription: 'Traditional pumpkin pie with a spiced pumpkin filling and a flaky crust.',
+    productPrice: 8.99,
+    productImage: 'https://tastesbetterfromscratch.com/wp-content/uploads/2022/10/PumpkinPie2-2.jpg'
+  },
+  {
+    id: '10',
+    productName: 'Peanut Butter Cookies',
+    productDescription: 'Soft and chewy peanut butter cookies with a criss-cross pattern.',
+    productPrice: 3.49,
+    productImage: 'https://abajillianrecipes.com/wp-content/uploads/2017/01/Ultimate-Peanut-Butter-Cookies-19.jpg'
+  },
+  {
+    id: '11',
+    productName: 'Lemon Meringue Pie',
+    productDescription: 'A tart and sweet lemon meringue pie with a fluffy meringue topping.',
+    productPrice: 10.99,
+    productImage: 'https://carlsbadcravings.com/wp-content/uploads/2023/04/Lemon-Meringue-Pie-11-500x500.jpg'
+  },
+  {
+    id: '12',
+    productName: 'Chocolate Cake',
+    productDescription: 'Rich and moist chocolate cake with a smooth chocolate frosting.',
+    productPrice: 8.99,
+    productImage: 'https://sallysbakingaddiction.com/wp-content/uploads/2013/04/triple-chocolate-cake-4.jpg'
+  },
 ];
 
-const ProductCatalog = ({ products, deleteProduct }) => {
+const ProductCatalog = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-4">Product Catalog</h1>
@@ -72,7 +100,7 @@ const ProductCatalog = ({ products, deleteProduct }) => {
             <p className="text-gray-700 mb-2">{preset.productDescription}</p>
             <p className="text-gray-900 font-bold mb-4">${preset.productPrice.toFixed(2)}</p>
             <Link to="/checkout">
-              <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">
+              <button className="bg-rose-900 hover:bg-zinc-900 text-white font-bold py-1 px-2 rounded">
                 Add to Cart
               </button>
             </Link>
