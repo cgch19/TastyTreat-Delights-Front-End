@@ -41,19 +41,15 @@ function App() {
 
   const getProduct = async () => {
     try {
-      // if (!isLoggedIn) {
-      //   console.log("User is not logged in. Cannot fetch treats.");
-      //   return;
-      // }
       const response = await fetch(`${URL}/Treats`, {
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+          "Content-Type": "application/json",
         }
       });
       const data = await response.json();
       if (response.ok) {
         setProducts(data.data);
-        console.log("treats fetched successfully.");
+        console.log("Treats fetched successfully.");
       } else {
         console.log("Failed to fetch treats.");
       }
@@ -61,6 +57,7 @@ function App() {
       console.error("Error fetching treats:", error);
     }
   };
+
   
   // useEffect(() => {
   //   let token = localStorage.getItem("authToken");
@@ -72,31 +69,32 @@ function App() {
   //   }
   // }, );
 
-const createProduct = async (newProduct) => {
-  try {
-    const response = await fetch(`${URL}/Treats`, { 
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("authToken")}`
-      },
-      body: JSON.stringify(newProduct),
-    });
 
-    if (response.ok) {
-      console.log("Product created successfully.");
-      getProduct();
-      return true;
-    } else {
-      console.log("Failed to create product.");
-      console.log(response);
+  const createProduct = async (newProduct) => {
+    try {
+      const response = await fetch(`${URL}/Treats`, { 
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newProduct),
+      });
+
+      if (response.ok) {
+        console.log("Product created successfully.");
+        getProduct();
+        return true;
+      } else {
+        console.log("Failed to create product.");
+        console.log(response);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error creating product:", error);
       return false;
     }
-  } catch (error) {
-    console.error("Error creating product:", error);
-    return false;
-  }
-};
+  };
+
 
   const updateProduct = async (updateProduct) => {
     if (!isLoggedIn) {
