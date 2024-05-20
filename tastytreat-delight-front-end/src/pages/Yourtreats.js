@@ -21,24 +21,20 @@ const Yourtreats = ({ products }) => {
         </Link>
       </div>
       <h1 className="text-3xl font-bold mb-4">Your Treats</h1>
-      <div className="mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {treats.length === 0 ? (
           <p>No treats added yet.</p>
         ) : (
-          <ul>
-            {treats.map((treat, index) => (
-              <li key={index} className="mb-4">
-                <div className="bg-white shadow-md rounded p-4">
-                  {treat.Image && (
-                    <img src={treat.Image} alt={treat.Product} className="w-full h-auto object-cover rounded mb-4"/>
-                  )}
-                  <h3 className="text-xl font-bold">{treat.Product}</h3>
-                  <p>{treat.Description}</p>
-                  <p>Price: ${treat.Price}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          treats.map((treat, index) => (
+            <div key={index} className="border border-gray-300 rounded-md p-4 shadow-md">
+              {treat.Image && (
+                <img src={treat.Image} alt={treat.Product} className="w-full h-48 object-cover mb-4" />
+              )}
+              <h3 className="text-xl font-bold mb-2">{treat.Product}</h3>
+              <p className="text-gray-700 mb-2">{treat.Description}</p>
+              <p className="text-gray-900 font-bold mb-4">Price: ${treat.Price.toFixed(2)}</p>
+            </div>
+          ))
         )}
       </div>
     </div>
