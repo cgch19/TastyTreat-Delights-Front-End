@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Container, ThemeProvider } from '@mui/material';
 import Nav from './components/Nav';
 import Homepage from './pages/Homepage';
@@ -10,15 +10,42 @@ import Productform from './pages/Productform';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import theme from './theme';
-import '../src/index.css';
+import './index.css';
 import Productcatalog from './pages/Productcatalog';
 
-function App() {
+const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("authToken"));
-  const URL = process.env.REACT_APP_URL 
+  const URL = process.env.REACT_APP_URL;
   const [products, setProducts] = useState([]);
 
+  const getProducts = useCallback(async () => {
+    try {
+      const response = await fetch(`${URL}/Treats`, {
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+      const data = await response.json();
+      console.log("API response:", response);
+      console.log("Parsed data:", data);
+      if (response.ok) {
+        setProducts(data.data);
+        console.log("Treats fetched successfully.");
+      } else {
+        console.log("Failed to fetch treats.");
+      }
+    } catch (error) {
+      console.error("Error fetching treats:", error);
+    }
+  }, [URL]);
+
+  useEffect(() => {
+    getProducts();
+  }, [getProducts]);
+
   const handleSignUp = async (formData) => {
+    console.log("Signing up with data:", formData);
+
     try {
       const response = await fetch(`${URL}/auth/signup`, {
         method: 'POST',
@@ -39,50 +66,26 @@ function App() {
     }
   };
 
-  const getProduct = async () => {
-    try {
-      const response = await fetch(`${URL}/Treats`, {
-        headers: {
-          "Content-Type": "application/json",
-        }
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setProducts(data.data);
-        console.log("Treats fetched successfully.");
-      } else {
-        console.log("Failed to fetch treats.");
-      }
-    } catch (error) {
-      console.error("Error fetching treats:", error);
-    }
+  const handleLogout = () => {
+    console.log("Logging out");
+    localStorage.removeItem("authToken");
+    setIsLoggedIn(false);
   };
-
-  
-  // useEffect(() => {
-  //   let token = localStorage.getItem("authToken");
-  //   if (!token) {
-  //     setIsLoggedIn(false);
-  //   } else {
-  //     setIsLoggedIn(true);
-  //     getProduct();
-  //   }
-  // }, );
-
 
   const createProduct = async (newProduct) => {
     try {
-      const response = await fetch(`${URL}/Treats`, { 
+      const response = await fetch(`${URL}/Treats`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("authToken")}`
         },
         body: JSON.stringify(newProduct),
       });
 
       if (response.ok) {
         console.log("Product created successfully.");
-        getProduct();
+        getProducts();
         return true;
       } else {
         console.log("Failed to create product.");
@@ -95,25 +98,24 @@ function App() {
     }
   };
 
-
-  const updateProduct = async (updateProduct) => {
+  const updateProduct = async (updatedProduct, id) => {
     if (!isLoggedIn) {
       console.log("User is not logged in. Cannot update product.");
       return;
     }
     try {
-      const response = await fetch(`${URL}/products/${updateProduct.id}`, {
+      const response = await fetch(`${URL}/Treats/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("authToken")}`
         },
-        body: JSON.stringify(updateProduct),
+        body: JSON.stringify(updatedProduct),
       });
 
       if (response.ok) {
         console.log("Product updated successfully.");
-        await getProduct(); 
+        getProducts();
       } else {
         throw new Error(`Failed to update product with status: ${response.status}`);
       }
@@ -122,13 +124,13 @@ function App() {
     }
   };
 
-  const deleteProduct = async (productId) => {
+  const deleteProduct = async (id) => {
     if (!isLoggedIn) {
       console.log("User is not logged in. Cannot delete product.");
       return;
     }
     try {
-      const response = await fetch(`${URL}/products/${productId}`, {
+      const response = await fetch(`${URL}/Treats/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("authToken")}`
@@ -137,19 +139,13 @@ function App() {
 
       if (response.ok) {
         console.log("Product deleted successfully.");
-        getProduct();
+        getProducts();
       } else {
         console.log("Failed to delete product.");
       }
     } catch (error) {
       console.error("Error deleting product:", error);
     }
-  };
-
-  const handleLogout = () => {
-    console.log("in handle logout");
-    localStorage.removeItem("authToken");
-    setIsLoggedIn(false);
   };
 
   return (
