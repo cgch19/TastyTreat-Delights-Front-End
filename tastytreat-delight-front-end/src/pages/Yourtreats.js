@@ -32,7 +32,7 @@ const Yourtreats = ({ products }) => {
               )}
               <h3 className="text-xl font-bold mb-2">{treat.Product}</h3>
               <p className="text-gray-700 mb-2">{treat.Description}</p>
-              <p className="text-gray-900 font-bold mb-4">Price: ${treat.Price.toFixed(2)}</p>
+              <p className="text-gray-900 font-bold mb-4">Price: ${treat.Price}</p>
             </div>
           ))
         )}
