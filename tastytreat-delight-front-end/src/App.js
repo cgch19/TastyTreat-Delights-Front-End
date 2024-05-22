@@ -101,10 +101,6 @@ const App = () => {
   };
 
   const updateProduct = async (updatedProduct, id) => {
-    if (!isLoggedIn) {
-      console.log("User is not logged in. Cannot update product.");
-      return;
-    }
     try {
       const response = await fetch(`${URL}/Treats/${id}`, {
         method: "PUT",
@@ -127,10 +123,6 @@ const App = () => {
   };
 
   const deleteProduct = async (id) => {
-    if (!isLoggedIn) {
-      console.log("User is not logged in. Cannot delete product.");
-      return;
-    }
     try {
       const response = await fetch(`${URL}/Treats/${id}`, {
         method: "DELETE",
@@ -166,10 +158,10 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Homepage />} />
               <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} URL={URL} />} />
-              <Route path="/your-treats" element={<Yourtreats products={products} updateProduct={updateProduct} deleteProduct={deleteProduct} />} />
+              <Route path="/your-treats" element={<Yourtreats products={products} onDelete={deleteProduct} />} />
               <Route path="/signup" element={<Signup handleSignUp={handleSignUp} />} />
               <Route path="/checkout" element={<Checkoutpage />} />
-              <Route path="/product-detail/:id" element={<Productdetails products={products} />} />
+              <Route path="/product-detail/:id" element={<Productdetails products={products} updateProduct={updateProduct} />} />
               <Route path="/add-product" element={<Productform createProduct={createProduct} />} />
               <Route path="/product-catalog" element={<Productcatalog products={products} />} />
             </Routes>
