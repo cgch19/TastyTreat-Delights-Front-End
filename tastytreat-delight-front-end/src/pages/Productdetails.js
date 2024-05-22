@@ -13,7 +13,6 @@ function Productdetail() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch product details using the id
     fetchProductDetails(id).then(data => {
       setProduct(data);
       setFormValues({
@@ -26,7 +25,6 @@ function Productdetail() {
   }, [id]);
 
   const fetchProductDetails = async (id) => {
-    // Replace this with your actual fetch call
     const response = await fetch(`/api/products/${id}`);
     const data = await response.json();
     return data;
@@ -50,7 +48,6 @@ function Productdetail() {
   };
 
   const updateProductDetails = async (id, updatedProduct) => {
-    // Replace this with your actual update call
     await fetch(`/api/products/${id}`, {
       method: 'PUT',
       headers: {
