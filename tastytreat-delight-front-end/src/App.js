@@ -18,7 +18,7 @@ const App = () => {
   const URL = process.env.REACT_APP_URL;
   const [products, setProducts] = useState([]);
 
-  const getProducts = useCallback(async () => {
+  const getProduct = useCallback(async () => {
     try {
       const response = await fetch(`${URL}/Treats`, {
         headers: {
@@ -40,8 +40,8 @@ const App = () => {
   }, [URL]);
 
   useEffect(() => {
-    getProducts();
-  }, [getProducts]);
+    getProduct();
+  }, [getProduct]);
 
   const handleSignUp = async (formData) => {
     console.log("Signing up with data:", formData);
@@ -82,10 +82,12 @@ const App = () => {
         },
         body: JSON.stringify(newProduct),
       });
-
+      
       if (response.ok) {
+        const data = await response.json()
         console.log("Product created successfully.");
-        getProducts();
+        console.log(data);
+        getProduct();
         return true;
       } else {
         console.log("Failed to create product.");
@@ -115,7 +117,7 @@ const App = () => {
 
       if (response.ok) {
         console.log("Product updated successfully.");
-        getProducts();
+        getProduct();
       } else {
         throw new Error(`Failed to update product with status: ${response.status}`);
       }
@@ -139,7 +141,7 @@ const App = () => {
 
       if (response.ok) {
         console.log("Product deleted successfully.");
-        getProducts();
+        getProduct();
       } else {
         console.log("Failed to delete product.");
       }

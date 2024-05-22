@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 
 const Productform = (props) => {
   const newProductForm = {
-    productName: '',
-    productDescription: '',
-    productPrice: 0,
-    productImage: ''
+    Product: '',
+    Description: '',
+    Price: 0,
+    Image: ''
   };
 
   const [form, setForm] = useState(newProductForm);
@@ -19,12 +19,13 @@ const Productform = (props) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!form.productName || !form.productDescription || form.productPrice <= 0) {
-      setFormStatus('Please fill in all the fields correctly.');
-      return;
-    }
+    // if (!form.Product || !form.Description || form.Price <= 0) {
+    //   setFormStatus('Please fill in all the fields correctly.');
+    //   return;
+    // }
     try {
       const success = await props.createProduct(form);
+      console.log(form)
       if (success) {
         setFormStatus('Product added successfully!');
         setForm(newProductForm);
@@ -47,33 +48,30 @@ const Productform = (props) => {
       <h1 className="text-3xl font-bold mb-4">Add Treats</h1>
       <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <div className="mb-4">
-          <label htmlFor="productName" className="block text-gray-700 font-bold mb-2">Name</label>
+          <label htmlFor="Product" className="block text-gray-700 font-bold mb-2">Name</label>
           <input
             type="text"
             id="productName"
             name="productName"
-            value={form.productName}
             onChange={handleChange}
             className="border border-gray-300 rounded-md p-2 w-full"
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="productDescription" className="block text-gray-700 font-bold mb-2">Description</label>
+          <label htmlFor="Description" className="block text-gray-700 font-bold mb-2">Description</label>
           <textarea
-            id="productDescription"
-            name="productDescription"
-            value={form.productDescription}
+            id="Description"
+            name="Description"
             onChange={handleChange}
             className="border border-gray-300 rounded-md p-2 w-full"
           ></textarea>
         </div>
         <div className="mb-4">
-          <label htmlFor="productPrice" className="block text-gray-700 font-bold mb-2">Price</label>
+          <label htmlFor="Price" className="block text-gray-700 font-bold mb-2">Price</label>
           <input
             type="number"
-            id="productPrice"
-            name="productPrice"
-            value={form.productPrice}
+            id="Price"
+            name="Price"
             onChange={handleChange}
             min="0"
             step="0.01"
@@ -81,12 +79,11 @@ const Productform = (props) => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="productImage" className="block text-gray-700 font-bold mb-2">Image URL</label>
+          <label htmlFor="Image" className="block text-gray-700 font-bold mb-2">Image URL</label>
           <input
             type="text"
-            id="productImage"
-            name="productImage"
-            value={form.productImage}
+            id="Image"
+            name="Image"
             onChange={handleChange}
             className="border border-gray-300 rounded-md p-2 w-full"
           />
