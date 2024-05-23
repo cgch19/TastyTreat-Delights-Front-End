@@ -100,7 +100,7 @@ const App = () => {
     }
   };
 
-  const updateProduct = async (updatedProduct, id) => {
+  const updateProduct = async (treat, id) => {
     try {
       const response = await fetch(`${URL}/Treats/${id}`, {
         method: "PUT",
@@ -108,17 +108,18 @@ const App = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("authToken")}`
         },
-        body: JSON.stringify(updatedProduct),
+        body: JSON.stringify(treat),
       });
 
       if (response.ok) {
-        console.log("Product updated successfully.");
+        console.log("Treat updated successfully.");
         getProduct();
       } else {
-        throw new Error(`Failed to update product with status: ${response.status}`);
+        console.log("Failed to update treat:", response.statusText);
+        throw new Error(`Failed to update treat with status: ${response.status}`);
       }
     } catch (err) {
-      console.error("Error updating product:", err.message);
+      console.error("Error updating treat:", err.message);
     }
   };
 
@@ -161,7 +162,7 @@ const App = () => {
               <Route path="/your-treats" element={<Yourtreats products={products} onDelete={deleteProduct} />} />
               <Route path="/signup" element={<Signup handleSignUp={handleSignUp} />} />
               <Route path="/checkout" element={<Checkoutpage />} />
-              <Route path="/product-detail/:id" element={<Productdetails products={products} updateProduct={updateProduct} />} />
+              <Route path="/product-detail/:id" element={<Productdetails products={products} updateProduct={updateProduct} onDelete={deleteProduct} />} />
               <Route path="/add-product" element={<Productform createProduct={createProduct} />} />
               <Route path="/product-catalog" element={<Productcatalog products={products} />} />
             </Routes>

@@ -1,113 +1,108 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-function Productdetail() {
-  const { id } = useParams();
-  const [product, setProduct] = useState(null);
-  const [formValues, setFormValues] = useState({
-    Product: '',
-    Image: '',
-    Description: '',
-    Price: ''
-  });
+const Productdetails = ({ products, updateProduct, onDelete }) => {
+  const params = useParams();
+  const id = params.id;
   const navigate = useNavigate();
+  const product = products.find((p) => p._id === id);
+
+  const [form, setForm] = useState({
+    Product: '',
+    Description: '',
+    Price: '',
+    Image: ''
+  });
 
   useEffect(() => {
-    fetchProductDetails(id).then(data => {
-      setProduct(data);
-      setFormValues({
-        Product: data.Product,
-        Image: data.Image,
-        Description: data.Description,
-        Price: data.Price
-      });
-    });
-  }, [id]);
+    if (product) {
+      setForm(product);
+    }
+  }, [product]);
 
-  const fetchProductDetails = async (id) => {
-    const response = await fetch(`/api/products/${id}`);
-    const data = await response.json();
-    return data;
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormValues({
-      ...formValues,
-      [name]: value
-    });
-  };
-
-  const handleFormSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    // Submit updated product details
-    updateProductDetails(id, formValues).then(() => {
-      // Navigate back to the treats list or show a success message
-      navigate('/your-treats');
-    });
+    updateProduct(form, id).then(() => navigate('/your-treats'));
   };
 
-  const updateProductDetails = async (id, updatedProduct) => {
-    await fetch(`/api/products/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(updatedProduct)
-    });
+  const handleDelete = () => {
+    onDelete(id).then(() => navigate('/your-treats'));
   };
 
   if (!product) {
-    return <div>Loading...</div>;
+    return <div>Product not found</div>;
   }
 
   return (
-    <div>
-      <h1>Edit Product</h1>
-      <form onSubmit={handleFormSubmit}>
-        <div>
-          <label htmlFor="Product">Product:</label>
-          <input
-            type="text"
-            id="Product"
-            name="Product"
-            value={formValues.Product}
-            onChange={handleInputChange}
-          />
+    <div style={{ textAlign: 'center', width: '400px', margin: '0 auto', border: '1px solid #ccc', padding: '16px', borderRadius: '8px' }}>
+      <h2 style={{ fontSize: '24px', marginBottom: '16px' }}>{product.Product}</h2>
+      <p><strong>Description:</strong> {product.Description}</p>
+      <p><strong>Price:</strong> {product.Price}</p>
+      <p><strong>Image:</strong><br /><img src={product.Image} alt={product.Product} style={{ maxWidth: '100%', height: 'auto' }} /></p>
+
+      <section style={{ marginTop: '24px', textAlign: 'center' }}>
+        <div style={{ display: 'inline-block', textAlign: 'left', maxWidth: '400px', width: '100%' }}>
+          <h2 style={{ fontSize: '24px', marginBottom: '16px' }}>Edit Product</h2>
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px' }}>Product Name</label>
+              <input
+                type="text"
+                name="Product"
+                value={form.Product}
+                placeholder="Product Name"
+                onChange={handleChange}
+                style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+              />
+            </div>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px' }}>Description</label>
+              <input
+                type="text"
+                name="Description"
+                value={form.Description}
+                placeholder="Description"
+                onChange={handleChange}
+                style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+              />
+            </div>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px' }}>Price</label>
+              <input
+                type="number"
+                name="Price"
+                value={form.Price}
+                placeholder="Price"
+                onChange={handleChange}
+                style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+              />
+            </div>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px' }}>Image URL</label>
+              <input
+                type="text"
+                name="Image"
+                value={form.Image}
+                placeholder="Image URL"
+                onChange={handleChange}
+                style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+              />
+            </div>
+            <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              Submit
+            </button>
+            <button type="button" onClick={handleDelete} style={{ padding: '10px 20px', backgroundColor: '#ff0000', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginLeft: '10px' }}>
+              Delete
+            </button>
+          </form>
         </div>
-        <div>
-          <label htmlFor="Description">Description:</label>
-          <textarea
-            id="Description"
-            name="Description"
-            value={formValues.Description}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="Price">Price:</label>
-          <input
-            type="number"
-            id="Price"
-            name="Price"
-            value={formValues.Price}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="Image">Image URL:</label>
-          <input
-            type="text"
-            id="Image"
-            name="Image"
-            value={formValues.Image}
-            onChange={handleInputChange}
-          />
-        </div>
-        <button type="submit">Save</button>
-      </form>
+      </section>
     </div>
   );
-}
+};
 
-export default Productdetail;
+export default Productdetails;
