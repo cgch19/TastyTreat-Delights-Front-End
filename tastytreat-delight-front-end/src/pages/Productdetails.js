@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-const Productdetails = ({ products, updateProduct, onDelete }) => {
+const Productdetails = ({ products, updateProduct }) => {
   const params = useParams();
   const id = params.id;
   const navigate = useNavigate();
@@ -27,10 +27,6 @@ const Productdetails = ({ products, updateProduct, onDelete }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     updateProduct(form, id).then(() => navigate('/your-treats'));
-  };
-
-  const handleDelete = () => {
-    onDelete(id).then(() => navigate('/your-treats'));
   };
 
   if (!product) {
@@ -94,9 +90,6 @@ const Productdetails = ({ products, updateProduct, onDelete }) => {
             </div>
             <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
               Submit
-            </button>
-            <button type="button" onClick={handleDelete} style={{ padding: '10px 20px', backgroundColor: '#ff0000', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginLeft: '10px' }}>
-              Delete
             </button>
           </form>
         </div>
