@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-const Yourtreats = ({ products, onDelete }) => {
+const Yourtreats = ({ products, onDelete, onSell }) => {
   const [treats, setTreats] = useState([]);
 
   useEffect(() => {
@@ -14,6 +14,12 @@ const Yourtreats = ({ products, onDelete }) => {
   const handleDelete = (id) => {
     if (onDelete) {
       onDelete(id);
+    }
+  };
+
+  const handleSell = (treat) => {
+    if (onSell) {
+      onSell(treat);
     }
   };
 
@@ -41,12 +47,20 @@ const Yourtreats = ({ products, onDelete }) => {
                 <p className="text-gray-700 mb-2">{treat.Description}</p>
                 <p className="text-gray-900 font-bold mb-4">Price: ${treat.Price}</p>
               </Link>
-              <button
-                onClick={() => handleDelete(treat._id)}
-                className="bg-rose-900 hover:bg-zinc-900 text-white font-bold py-2 px-4 rounded mt-2"
-              >
-                Delete
-              </button>
+              <div className="flex justify-between mt-2">
+                <button
+                  onClick={() => handleDelete(treat._id)}
+                  className="bg-rose-900 hover:bg-zinc-900 text-white font-bold py-2 px-4 rounded"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => handleSell(treat)}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Sell
+                </button>
+              </div>
             </div>
           ))
         )}

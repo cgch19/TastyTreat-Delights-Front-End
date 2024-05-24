@@ -17,6 +17,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("authToken"));
   const URL = process.env.REACT_APP_URL;
   const [products, setProducts] = useState([]);
+  const [catalog, setCatalog] = useState([]); 
 
   const getProduct = useCallback(async () => {
     try {
@@ -39,9 +40,31 @@ const App = () => {
     }
   }, [URL]);
 
+  const getCatalog = useCallback(async () => {
+    try {
+      const response = await fetch(`${URL}/Catalog`, {
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+      const data = await response.json();
+      console.log("API response:", response);
+      console.log("Parsed data:", data);
+      if (response.ok) {
+        setCatalog(data.data);
+        console.log("Catalog fetched successfully.");
+      } else {
+        console.log("Failed to fetch catalog.");
+      }
+    } catch (error) {
+      console.error("Error fetching catalog:", error);
+    }
+  }, [URL]);
+
   useEffect(() => {
     getProduct();
-  }, [getProduct]);
+    getCatalog(); // Fetch catalog items on component mount
+  }, [getProduct, getCatalog]);
 
   const handleSignUp = async (formData) => {
     console.log("Signing up with data:", formData);
@@ -84,7 +107,7 @@ const App = () => {
       });
       
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json();
         console.log("Product created successfully.");
         console.log(data);
         getProduct();
@@ -143,6 +166,30 @@ const App = () => {
     }
   };
 
+  const sellProduct = async (treat) => {
+    try {
+      const response = await fetch(`${URL}/Treats/sell`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+        },
+        body: JSON.stringify(treat),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Product sold and added to catalog:", data);
+        setCatalog([...catalog, data.data]);
+        setProducts(products.filter(product => product._id !== treat._id));
+      } else {
+        console.log("Failed to sell product.");
+      }
+    } catch (error) {
+      console.error("Error selling product:", error);
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Router>
@@ -159,12 +206,12 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Homepage />} />
               <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} URL={URL} />} />
-              <Route path="/your-treats" element={<Yourtreats products={products} onDelete={deleteProduct} />} />
+              <Route path="/your-treats" element={<Yourtreats products={products} onDelete={deleteProduct} onSell={sellProduct} />} />
               <Route path="/signup" element={<Signup handleSignUp={handleSignUp} />} />
               <Route path="/checkout" element={<Checkoutpage />} />
               <Route path="/product-detail/:id" element={<Productdetails products={products} updateProduct={updateProduct} onDelete={deleteProduct} />} />
               <Route path="/add-product" element={<Productform createProduct={createProduct} />} />
-              <Route path="/product-catalog" element={<Productcatalog products={products} />} />
+              <Route path="/product-catalog" element={<Productcatalog products={catalog} />} />
             </Routes>
           </Container>
         </div>
