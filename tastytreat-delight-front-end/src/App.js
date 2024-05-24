@@ -166,7 +166,28 @@ const App = () => {
     }
   };
 
+  const deleteCatalogItem = async (id) => {
+    try {
+      const response = await fetch(`${URL}/Catalog/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+        },
+      });
+
+      if (response.ok) {
+        console.log("Catalog item deleted successfully.");
+        getCatalog();
+      } else {
+        console.log("Failed to delete catalog item.");
+      }
+    } catch (error) {
+      console.error("Error deleting catalog item:", error);
+    }
+  };
+
   const sellProduct = async (treat) => {
+    const { _id } = treat;
     try {
       const response = await fetch(`${URL}/Treats/sell`, {
         method: "POST",
@@ -181,7 +202,7 @@ const App = () => {
         const data = await response.json();
         console.log("Product sold and added to catalog:", data);
         setCatalog([...catalog, data.data]);
-        setProducts(products.filter(product => product._id !== treat._id));
+        setProducts(products.filter(product => product._id !== _id));
       } else {
         console.log("Failed to sell product.");
       }
@@ -211,7 +232,7 @@ const App = () => {
               <Route path="/checkout" element={<Checkoutpage />} />
               <Route path="/product-detail/:id" element={<Productdetails products={products} updateProduct={updateProduct} onDelete={deleteProduct} />} />
               <Route path="/add-product" element={<Productform createProduct={createProduct} />} />
-              <Route path="/product-catalog" element={<Productcatalog products={catalog} />} />
+              <Route path="/product-catalog" element={<Productcatalog products={catalog} onDelete={deleteCatalogItem} />} />
             </Routes>
           </Container>
         </div>

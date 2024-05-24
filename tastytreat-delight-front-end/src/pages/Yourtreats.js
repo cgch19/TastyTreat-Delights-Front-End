@@ -5,10 +5,7 @@ const Yourtreats = ({ products, onDelete, onSell }) => {
   const [treats, setTreats] = useState([]);
 
   useEffect(() => {
-    if (products) {
-      setTreats(products);
-      console.log("Products received in Yourtreats:", products);
-    }
+    setTreats(products);
   }, [products]);
 
   const handleDelete = (id) => {
@@ -17,8 +14,9 @@ const Yourtreats = ({ products, onDelete, onSell }) => {
     }
   };
 
-  const handleSell = (treat) => {
-    if (onSell) {
+  const addToCatalog = (id) => {
+    const treat = treats.find(treat => treat._id === id);
+    if (treat && onSell) {
       onSell(treat);
     }
   };
@@ -55,10 +53,10 @@ const Yourtreats = ({ products, onDelete, onSell }) => {
                   Delete
                 </button>
                 <button
-                  onClick={() => handleSell(treat)}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={() => addToCatalog(treat._id)}
+                  className="bg-rose-900 hover:bg-zinc-900 text-white font-bold py-2 px-4 rounded"
                 >
-                  Sell
+                  Add to Catalog
                 </button>
               </div>
             </div>
