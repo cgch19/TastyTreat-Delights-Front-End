@@ -22,9 +22,6 @@ function Nav({ isLoggedIn, handleLogout }) {
       <div>
         {isLoggedIn ? (
           <>
-            <Button color="inherit" component={Link} to="/add-product" className="hover:text-gray-300">
-              Add Product
-            </Button>
             <Button color="inherit" onClick={handleLogout} className="hover:text-gray-300">
               Logout
             </Button>

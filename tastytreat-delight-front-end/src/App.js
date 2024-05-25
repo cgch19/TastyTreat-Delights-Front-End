@@ -17,7 +17,11 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("authToken"));
   const URL = process.env.REACT_APP_URL;
   const [products, setProducts] = useState([]);
-  const [catalog, setCatalog] = useState([]); 
+  const [catalog, setCatalog] = useState([]);
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
 
   const getProduct = useCallback(async () => {
     try {
@@ -63,8 +67,12 @@ const App = () => {
 
   useEffect(() => {
     getProduct();
-    getCatalog(); // Fetch catalog items on component mount
+    getCatalog(); 
   }, [getProduct, getCatalog]);
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
   const handleSignUp = async (formData) => {
     console.log("Signing up with data:", formData);
@@ -211,6 +219,15 @@ const App = () => {
     }
   };
 
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+    console.log("Product added to cart:", product);
+  };
+
+  const removeFromCart = (id) => {
+    setCart(cart.filter(item => item._id !== id));
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Router>
@@ -229,10 +246,10 @@ const App = () => {
               <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} URL={URL} />} />
               <Route path="/your-treats" element={<Yourtreats products={products} onDelete={deleteProduct} onSell={sellProduct} />} />
               <Route path="/signup" element={<Signup handleSignUp={handleSignUp} />} />
-              <Route path="/checkout" element={<Checkoutpage />} />
+              <Route path="/checkout" element={<Checkoutpage cart={cart} onRemove={removeFromCart} />} />
               <Route path="/product-detail/:id" element={<Productdetails products={products} updateProduct={updateProduct} onDelete={deleteProduct} />} />
               <Route path="/add-product" element={<Productform createProduct={createProduct} />} />
-              <Route path="/product-catalog" element={<Productcatalog products={catalog} onDelete={deleteCatalogItem} />} />
+              <Route path="/product-catalog" element={<Productcatalog products={catalog} onDelete={deleteCatalogItem} onAddToCart={addToCart} />} />
             </Routes>
           </Container>
         </div>

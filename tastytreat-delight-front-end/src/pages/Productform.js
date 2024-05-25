@@ -51,8 +51,8 @@ const Productform = (props) => {
           <label htmlFor="Product" className="block text-gray-700 font-bold mb-2">Name</label>
           <input
             type="text"
-            id="productName"
-            name="productName"
+            id="Product"
+            name="Product"
             onChange={handleChange}
             className="border border-gray-300 rounded-md p-2 w-full"
           />
