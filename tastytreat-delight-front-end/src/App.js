@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Remove useLocation import
 import { AppBar, Toolbar, Typography, Container, ThemeProvider } from '@mui/material';
 import Nav from './components/Nav';
 import Homepage from './pages/Homepage';
@@ -13,11 +13,43 @@ import theme from './theme';
 import './index.css';
 import Productcatalog from './pages/Productcatalog';
 
+const ProtectedRoute = ({ children, isLoggedIn }) => {
+  if (!isLoggedIn) {
+    console.log('You need to log in first');
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("authToken"));
   const URL = process.env.REACT_APP_URL;
   const [products, setProducts] = useState([]);
   const [catalog, setCatalog] = useState([]);
+
+  const handleSignUp = async (formData) => {
+    console.log("Signing up with data:", formData);
+  
+    try {
+      const response = await fetch(`${URL}/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to sign up');
+      }
+  
+      const data = await response.json();
+      console.log('User signed up:', data);
+    } catch (error) {
+      console.error('Error during sign up:', error);
+    }
+  };
+  
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
@@ -73,29 +105,6 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
-
-  const handleSignUp = async (formData) => {
-    console.log("Signing up with data:", formData);
-
-    try {
-      const response = await fetch(`${URL}/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to sign up');
-      }
-
-      const data = await response.json();
-      console.log('User signed up:', data);
-    } catch (error) {
-      console.error('Error during sign up:', error);
-    }
-  };
 
   const handleLogout = () => {
     console.log("Logging out");
@@ -244,9 +253,17 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Homepage />} />
               <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} URL={URL} />} />
-              <Route path="/your-treats" element={<Yourtreats products={products} onDelete={deleteProduct} onSell={sellProduct} />} />
+              <Route path="/your-treats" element={
+                <ProtectedRoute isLoggedIn={isLoggedIn}>
+                  <Yourtreats products={products} onDelete={deleteProduct} onSell={sellProduct} />
+                </ProtectedRoute>
+              } />
               <Route path="/signup" element={<Signup handleSignUp={handleSignUp} />} />
-              <Route path="/checkout" element={<Checkoutpage cart={cart} onRemove={removeFromCart} />} />
+              <Route path="/checkout" element={
+                <ProtectedRoute isLoggedIn={isLoggedIn}>
+                  <Checkoutpage cart={cart} onRemove={removeFromCart} />
+                </ProtectedRoute>
+              } />
               <Route path="/product-detail/:id" element={<Productdetails products={products} updateProduct={updateProduct} onDelete={deleteProduct} />} />
               <Route path="/add-product" element={<Productform createProduct={createProduct} />} />
               <Route path="/product-catalog" element={<Productcatalog products={catalog} onDelete={deleteCatalogItem} onAddToCart={addToCart} />} />

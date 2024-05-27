@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, TextField, Typography, Container, Box } from '@mui/material'; // Updated to use MUI components
+import { Button, TextField, Typography, Container, Box } from '@mui/material'; 
 
 const Signup = (props) => {
   const [form, setForm] = useState({ username: '', email: '', password: '' });
