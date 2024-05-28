@@ -29,6 +29,15 @@ const Checkoutpage = ({ cart, onRemove, onQuantityChange }) => {
     });
   };
 
+  const calculateTotal = () => {
+    if (!cart || !cart.length) return 0;
+    return cart.reduce((sum, item) => {
+      const quantity = quantities[item._id] || 0;
+      const price = item.Price || 0;
+      return sum + (price * quantity);
+    }, 0);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row">
       <div className="lg:w-1/2 lg:pr-8">
@@ -41,8 +50,8 @@ const Checkoutpage = ({ cart, onRemove, onQuantityChange }) => {
           </Typography>
         ) : (
           <div>
-            {cart.map((item, index) => (
-              <div key={index} className="border-b border-gray-300 py-4 flex items-center">
+            {cart.map((item) => (
+              <div key={item._id} className="border-b border-gray-300 py-4 flex items-center">
                 <img
                   src={item.Image}
                   alt={item.Product}
@@ -74,7 +83,7 @@ const Checkoutpage = ({ cart, onRemove, onQuantityChange }) => {
                 </div>
                 <div className="text-right">
                   <Typography variant="body1" className="text-lg font-bold">
-                    ${(item.Price * quantities[item._id]).toFixed(2)}
+                    ${(item.Price * (quantities[item._id] || 1)).toFixed(2)}
                   </Typography>
                   <Button
                     size="small"
@@ -88,15 +97,12 @@ const Checkoutpage = ({ cart, onRemove, onQuantityChange }) => {
               </div>
             ))}
             <div className="text-right font-bold text-xl mt-4">
-              Subtotal: ${cart.reduce((sum, item) => sum + item.Price * quantities[item._id], 0).toFixed(2)}
+              Subtotal: ${calculateTotal().toFixed(2)}
             </div>
           </div>
         )}
       </div>
       <div className="lg:w-1/2 lg:pl-8 mt-8 lg:mt-0">
-        <Typography variant="h3" component="h2" className="text-3xl font-bold mb-4">
-          Checkout
-        </Typography>
         <div className="bg-white shadow-md rounded-lg p-8">
           <Typography variant="body1" className="mb-4">
             Enter your email address.
@@ -111,7 +117,7 @@ const Checkoutpage = ({ cart, onRemove, onQuantityChange }) => {
             <label htmlFor="newsletter" className="text-sm">Keep me up to date on news and exclusive offers</label>
           </div>
           <Button className="bg-rose-900 text-white font-bold py-2 px-4 rounded w-full mb-4" variant="contained">
-            Checkout
+            Buy Now
           </Button>
         </div>
       </div>

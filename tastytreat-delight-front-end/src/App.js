@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Remove useLocation import
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Container, ThemeProvider } from '@mui/material';
 import Nav from './components/Nav';
 import Homepage from './pages/Homepage';
@@ -22,14 +22,19 @@ const ProtectedRoute = ({ children, isLoggedIn }) => {
 };
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("authToken"));
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("authToken"));
   const URL = process.env.REACT_APP_URL;
   const [products, setProducts] = useState([]);
   const [catalog, setCatalog] = useState([]);
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  const getToken = () => localStorage.getItem("authToken");
 
   const handleSignUp = async (formData) => {
     console.log("Signing up with data:", formData);
-  
     try {
       const response = await fetch(`${URL}/auth/signup`, {
         method: 'POST',
@@ -38,38 +43,28 @@ const App = () => {
         },
         body: JSON.stringify(formData),
       });
-  
-      if (!response.ok) {
-        throw new Error('Failed to sign up');
-      }
-  
+      if (!response.ok) throw new Error('Failed to sign up');
       const data = await response.json();
       console.log('User signed up:', data);
     } catch (error) {
       console.error('Error during sign up:', error);
     }
   };
-  
-  const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem("cart");
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
 
   const getProduct = useCallback(async () => {
     try {
       const response = await fetch(`${URL}/Treats`, {
         headers: {
-          "Content-Type": "application/json",
-        }
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`,
+        },
       });
       const data = await response.json();
-      console.log("API response:", response);
-      console.log("Parsed data:", data);
       if (response.ok) {
         setProducts(data.data);
         console.log("Treats fetched successfully.");
       } else {
-        console.log("Failed to fetch treats.");
+        console.error("Failed to fetch treats.");
       }
     } catch (error) {
       console.error("Error fetching treats:", error);
@@ -80,17 +75,16 @@ const App = () => {
     try {
       const response = await fetch(`${URL}/Catalog`, {
         headers: {
-          "Content-Type": "application/json",
-        }
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`,
+        },
       });
       const data = await response.json();
-      console.log("API response:", response);
-      console.log("Parsed data:", data);
       if (response.ok) {
         setCatalog(data.data);
         console.log("Catalog fetched successfully.");
       } else {
-        console.log("Failed to fetch catalog.");
+        console.error("Failed to fetch catalog.");
       }
     } catch (error) {
       console.error("Error fetching catalog:", error);
@@ -98,9 +92,11 @@ const App = () => {
   }, [URL]);
 
   useEffect(() => {
-    getProduct();
-    getCatalog(); 
-  }, [getProduct, getCatalog]);
+    if (isLoggedIn) {
+      getProduct();
+      getCatalog();
+    }
+  }, [isLoggedIn, getProduct, getCatalog]);
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -115,23 +111,20 @@ const App = () => {
   const createProduct = async (newProduct) => {
     try {
       const response = await fetch(`${URL}/Treats`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`,
         },
         body: JSON.stringify(newProduct),
       });
-      
       if (response.ok) {
         const data = await response.json();
-        console.log("Product created successfully.");
-        console.log(data);
+        console.log("Product created successfully.", data);
         getProduct();
         return true;
       } else {
-        console.log("Failed to create product.");
-        console.log(response);
+        console.error("Failed to create product.", response);
         return false;
       }
     } catch (error) {
@@ -143,40 +136,38 @@ const App = () => {
   const updateProduct = async (treat, id) => {
     try {
       const response = await fetch(`${URL}/Treats/${id}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`,
         },
         body: JSON.stringify(treat),
       });
-
       if (response.ok) {
         console.log("Treat updated successfully.");
         getProduct();
       } else {
-        console.log("Failed to update treat:", response.statusText);
+        console.error("Failed to update treat:", response.statusText);
         throw new Error(`Failed to update treat with status: ${response.status}`);
       }
-    } catch (err) {
-      console.error("Error updating treat:", err.message);
+    } catch (error) {
+      console.error("Error updating treat:", error.message);
     }
   };
 
   const deleteProduct = async (id) => {
     try {
       const response = await fetch(`${URL}/Treats/${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+          'Authorization': `Bearer ${getToken()}`,
         },
       });
-
       if (response.ok) {
         console.log("Product deleted successfully.");
         getProduct();
       } else {
-        console.log("Failed to delete product.");
+        console.error("Failed to delete product.");
       }
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -186,17 +177,16 @@ const App = () => {
   const deleteCatalogItem = async (id) => {
     try {
       const response = await fetch(`${URL}/Catalog/${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+          'Authorization': `Bearer ${getToken()}`,
         },
       });
-
       if (response.ok) {
         console.log("Catalog item deleted successfully.");
         getCatalog();
       } else {
-        console.log("Failed to delete catalog item.");
+        console.error("Failed to delete catalog item.");
       }
     } catch (error) {
       console.error("Error deleting catalog item:", error);
@@ -207,21 +197,20 @@ const App = () => {
     const { _id } = treat;
     try {
       const response = await fetch(`${URL}/Treats/sell`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`,
         },
         body: JSON.stringify(treat),
       });
-  
       if (response.ok) {
         const data = await response.json();
         console.log("Product sold and added to catalog:", data);
         setCatalog([...catalog, data.data]);
         setProducts(products.filter(product => product._id !== _id));
       } else {
-        console.log("Failed to sell product.");
+        console.error("Failed to sell product.");
       }
     } catch (error) {
       console.error("Error selling product:", error);
@@ -273,6 +262,6 @@ const App = () => {
       </Router>
     </ThemeProvider>
   );
-}
+};
 
 export default App;
