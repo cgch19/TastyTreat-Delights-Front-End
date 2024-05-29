@@ -20,6 +20,7 @@ const ProtectedRoute = ({ children, isLoggedIn }) => {
   }
   return children;
 };
+
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('authToken'));
   const URL = process.env.REACT_APP_URL;
@@ -32,15 +33,41 @@ const App = () => {
 
   const getToken = () => localStorage.getItem('authToken');
 
-  const handleSignUp = async (formData) => {
-    console.log('Signing up with data:', formData);
+  const handleLogin = async (user, navigate) => {
+    try {
+      const response = await fetch(`${URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user)
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to login');
+      }
+  
+      const data = await response.json();
+      localStorage.setItem("authToken", data.token);
+      setIsLoggedIn(true);
+      navigate(`/`);
+    } catch (error) {
+      console.error('Error during login:', error);
+      return error.message;
+    }
+  };
+  
+
+  const handleSignUp = async (user) => {
+    console.log('Signing up with data:', user);
     try {
       const response = await fetch(`${URL}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(user),
       });
       if (!response.ok) throw new Error('Failed to sign up');
       const data = await response.json();
@@ -254,7 +281,7 @@ const App = () => {
           <Container className="mt-8">
             <Routes>
               <Route path="/" element={<Homepage />} />
-              <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} URL={URL} />} />
+              <Route path="/login" element={<Login handleLogin={handleLogin} />} />
               <Route path="/your-treats" element={
                 <ProtectedRoute isLoggedIn={isLoggedIn}>
                   <Yourtreats products={products} onDelete={deleteProduct} onSell={sellProduct} />
@@ -278,4 +305,3 @@ const App = () => {
 };
 
 export default App;
-
