@@ -20,21 +20,20 @@ const ProtectedRoute = ({ children, isLoggedIn }) => {
   }
   return children;
 };
-
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("authToken"));
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('authToken'));
   const URL = process.env.REACT_APP_URL;
   const [products, setProducts] = useState([]);
   const [catalog, setCatalog] = useState([]);
   const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem("cart");
+    const savedCart = localStorage.getItem('cart');
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
-  const getToken = () => localStorage.getItem("authToken");
+  const getToken = () => localStorage.getItem('authToken');
 
   const handleSignUp = async (formData) => {
-    console.log("Signing up with data:", formData);
+    console.log('Signing up with data:', formData);
     try {
       const response = await fetch(`${URL}/auth/signup`, {
         method: 'POST',
@@ -53,41 +52,45 @@ const App = () => {
 
   const getProduct = useCallback(async () => {
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`,
+      };
+      console.log('Fetching Treats with headers:', headers);
       const response = await fetch(`${URL}/Treats`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getToken()}`,
-        },
+        headers,
       });
       const data = await response.json();
       if (response.ok) {
         setProducts(data.data);
-        console.log("Treats fetched successfully.");
+        console.log('Treats fetched successfully.');
       } else {
-        console.error("Failed to fetch treats.");
+        console.error('Failed to fetch treats.');
       }
     } catch (error) {
-      console.error("Error fetching treats:", error);
+      console.error('Error fetching treats:', error);
     }
   }, [URL]);
 
   const getCatalog = useCallback(async () => {
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`,
+      };
+      console.log('Fetching Catalog with headers:', headers);
       const response = await fetch(`${URL}/Catalog`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getToken()}`,
-        },
+        headers,
       });
       const data = await response.json();
       if (response.ok) {
         setCatalog(data.data);
-        console.log("Catalog fetched successfully.");
+        console.log('Catalog fetched successfully.');
       } else {
-        console.error("Failed to fetch catalog.");
+        console.error('Failed to fetch catalog.');
       }
     } catch (error) {
-      console.error("Error fetching catalog:", error);
+      console.error('Error fetching catalog:', error);
     }
   }, [URL]);
 
@@ -99,127 +102,137 @@ const App = () => {
   }, [isLoggedIn, getProduct, getCatalog]);
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
   const handleLogout = () => {
-    console.log("Logging out");
-    localStorage.removeItem("authToken");
+    console.log('Logging out');
+    localStorage.removeItem('authToken');
     setIsLoggedIn(false);
   };
 
   const createProduct = async (newProduct) => {
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`,
+      };
+      console.log('Creating Product with headers:', headers);
       const response = await fetch(`${URL}/Treats`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getToken()}`,
-        },
+        headers,
         body: JSON.stringify(newProduct),
       });
       if (response.ok) {
         const data = await response.json();
-        console.log("Product created successfully.", data);
+        console.log('Product created successfully.', data);
         getProduct();
         return true;
       } else {
-        console.error("Failed to create product.", response);
+        console.error('Failed to create product.', response);
         return false;
       }
     } catch (error) {
-      console.error("Error creating product:", error);
+      console.error('Error creating product:', error);
       return false;
     }
   };
 
   const updateProduct = async (treat, id) => {
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`,
+      };
+      console.log('Updating Product with headers:', headers);
       const response = await fetch(`${URL}/Treats/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getToken()}`,
-        },
+        headers,
         body: JSON.stringify(treat),
       });
       if (response.ok) {
-        console.log("Treat updated successfully.");
+        console.log('Treat updated successfully.');
         getProduct();
       } else {
-        console.error("Failed to update treat:", response.statusText);
+        console.error('Failed to update treat:', response.statusText);
         throw new Error(`Failed to update treat with status: ${response.status}`);
       }
     } catch (error) {
-      console.error("Error updating treat:", error.message);
+      console.error('Error updating treat:', error.message);
     }
   };
 
   const deleteProduct = async (id) => {
     try {
+      const headers = {
+        'Authorization': `Bearer ${getToken()}`,
+      };
+      console.log('Deleting Product with headers:', headers);
       const response = await fetch(`${URL}/Treats/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${getToken()}`,
-        },
+        headers,
       });
       if (response.ok) {
-        console.log("Product deleted successfully.");
+        console.log('Product deleted successfully.');
         getProduct();
       } else {
-        console.error("Failed to delete product.");
+        console.error('Failed to delete product.');
       }
     } catch (error) {
-      console.error("Error deleting product:", error);
+      console.error('Error deleting product:', error);
     }
   };
 
   const deleteCatalogItem = async (id) => {
     try {
+      const headers = {
+        'Authorization': `Bearer ${getToken()}`,
+      };
+      console.log('Deleting Catalog Item with headers:', headers);
       const response = await fetch(`${URL}/Catalog/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${getToken()}`,
-        },
+        headers,
       });
       if (response.ok) {
-        console.log("Catalog item deleted successfully.");
+        console.log('Catalog item deleted successfully.');
         getCatalog();
       } else {
-        console.error("Failed to delete catalog item.");
+        console.error('Failed to delete catalog item.');
       }
     } catch (error) {
-      console.error("Error deleting catalog item:", error);
+      console.error('Error deleting catalog item:', error);
     }
   };
 
   const sellProduct = async (treat) => {
     const { _id } = treat;
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`,
+      };
+      console.log('Selling Product with headers:', headers);
       const response = await fetch(`${URL}/Treats/sell`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getToken()}`,
-        },
+        headers,
         body: JSON.stringify(treat),
       });
       if (response.ok) {
         const data = await response.json();
-        console.log("Product sold and added to catalog:", data);
+        console.log('Product sold and added to catalog:', data);
         setCatalog([...catalog, data.data]);
         setProducts(products.filter(product => product._id !== _id));
       } else {
-        console.error("Failed to sell product.");
+        console.error('Failed to sell product.');
       }
     } catch (error) {
-      console.error("Error selling product:", error);
+      console.error('Error selling product:', error);
     }
   };
 
   const addToCart = (product) => {
     setCart([...cart, product]);
-    console.log("Product added to cart:", product);
+    console.log('Product added to cart:', product);
   };
 
   const removeFromCart = (id) => {
@@ -265,3 +278,4 @@ const App = () => {
 };
 
 export default App;
+
