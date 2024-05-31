@@ -19,6 +19,8 @@ import Blogs from './pages/Blogs';
 import BlogForm from './pages/BlogForm';
 import BlogDetails from './pages/BlogDetails';
 
+// Used some of the porject 3 inspiration
+
 const ProtectedRoute = ({ children, isLoggedIn }) => {
   if (!isLoggedIn) {
     console.log('You need to log in first');
