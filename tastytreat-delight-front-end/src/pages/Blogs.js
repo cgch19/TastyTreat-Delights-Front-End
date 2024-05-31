@@ -8,6 +8,11 @@ const Blogs = ({ blogs, onDelete, role }) => {
     setAllBlogs(blogs);
   }, [blogs]);
 
+  const handleDelete = (id) => {
+    if (onDelete) {
+      onDelete(id);
+    }
+  };
 
 
   return (
