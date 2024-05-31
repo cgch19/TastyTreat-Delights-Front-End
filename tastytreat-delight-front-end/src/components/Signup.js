@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Button, TextField, Typography, Container, Box } from '@mui/material'; 
+import { Button, TextField, Typography, Container, Box } from '@mui/material';
+import {  ToastContainer } from 'react-toastify';
 
-const Signup = (props) => {
+const Signup = ({handleSignUp}) => {
   const [form, setForm] = useState({ username: '', email: '', password: '' });
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    props.handleSignUp(form);
+    handleSignUp(form)
   };
 
   const handleChange = (e) => {
@@ -15,6 +15,7 @@ const Signup = (props) => {
 
   return (
     <Container component="main" maxWidth="xs">
+      <ToastContainer />
       <Box
         sx={{
           marginTop: 8,

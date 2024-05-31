@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Productcatalog = ({ products, onDelete, onAddToCart }) => {
+const Productcatalog = ({ products, onDelete, onAddToCart, userId, role }) => {
   const catalogDelete = (id) => {
     if (onDelete) {
       onDelete(id);
@@ -27,18 +27,21 @@ const Productcatalog = ({ products, onDelete, onAddToCart }) => {
               <p className="text-gray-700 mb-2">{product.Description}</p>
               <p className="text-gray-900 font-bold mb-4">Price: ${product.Price}</p>
               <div className="flex justify-between mt-2">
-                <button
+               {role==="Admin" && <button
                   onClick={() => catalogDelete(product._id)}
                   className="bg-rose-900 hover:bg-zinc-900 text-white font-bold py-2 px-4 rounded"
                 >
                   Delete
                 </button>
+              }
+              {userId && 
                 <button
                   onClick={() => addToCart(product)}
                   className="bg-rose-900 hover:bg-zinc-900 text-white font-bold py-2 px-4 rounded"
                 >
                   Add to Cart
                 </button>
+             }
               </div>
             </div>
           ))

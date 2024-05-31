@@ -10,8 +10,14 @@ import Productform from './pages/Productform';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import theme from './theme';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import './index.css';
 import Productcatalog from './pages/Productcatalog';
+import Blogs from './pages/Blogs';
+import BlogForm from './pages/BlogForm';
+import BlogDetails from './pages/BlogDetails';
 
 const ProtectedRoute = ({ children, isLoggedIn }) => {
   if (!isLoggedIn) {
@@ -23,9 +29,12 @@ const ProtectedRoute = ({ children, isLoggedIn }) => {
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('authToken'));
+  const [userId, setUserId]= useState(localStorage.getItem('userId'));
+  const [role,setRole]= useState(localStorage.getItem("role"))
   const URL = process.env.REACT_APP_URL;
   const [products, setProducts] = useState([]);
   const [catalog, setCatalog] = useState([]);
+  const [blogs, setBlogs] = useState([])
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('cart');
     return savedCart ? JSON.parse(savedCart) : [];
@@ -35,7 +44,7 @@ const App = () => {
 
   const handleLogin = async (user, navigate) => {
     try {
-      const response = await fetch(`${URL}/auth/login`, {
+      const response = await fetch(`${URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,11 +59,16 @@ const App = () => {
   
       const data = await response.json();
       localStorage.setItem("authToken", data.token);
+      localStorage.setItem("userId", data.id)
+      localStorage.setItem("role", data.role)
       setIsLoggedIn(true);
+      setUserId(data.id)
+      setRole(data.role)
+      toast.success('Login successful!');
       navigate(`/`);
     } catch (error) {
       console.error('Error during login:', error);
-      return error.message;
+      toast.error(error.message);
     }
   };
   
@@ -62,18 +76,26 @@ const App = () => {
   const handleSignUp = async (user) => {
     console.log('Signing up with data:', user);
     try {
-      const response = await fetch(`${URL}/auth/signup`, {
+      const response = await fetch(`${URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(user),
       });
-      if (!response.ok) throw new Error('Failed to sign up');
-      const data = await response.json();
-      console.log('User signed up:', data);
+      if (!response.ok) {
+        let errorMessage = 'Failed to sign up';
+      if (response.status === 400) {
+        const errorData = await response.json();
+        errorMessage = errorData.message || 'Invalid data provided';
+      }
+      throw new Error(errorMessage);
+      }
+       await response.json();
+      toast.success("Signup successfully.")
     } catch (error) {
       console.error('Error during sign up:', error);
+      toast.error(error.message);
     }
   };
 
@@ -84,7 +106,7 @@ const App = () => {
         'Authorization': `Bearer ${getToken()}`,
       };
       console.log('Fetching Treats with headers:', headers);
-      const response = await fetch(`${URL}/Treats`, {
+      const response = await fetch(`${URL}/api/Treats`, {
         headers,
       });
       const data = await response.json();
@@ -103,10 +125,9 @@ const App = () => {
     try {
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getToken()}`,
       };
       console.log('Fetching Catalog with headers:', headers);
-      const response = await fetch(`${URL}/Catalog`, {
+      const response = await fetch(`${URL}/api/Catalog`, {
         headers,
       });
       const data = await response.json();
@@ -121,12 +142,37 @@ const App = () => {
     }
   }, [URL]);
 
+  const getBlogs = useCallback(async () => {
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      };
+      console.log('Fetching Catalog with headers:', headers);
+      const response = await fetch(`${URL}/api/blogs`, {
+        headers,
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data.data)
+        setBlogs(data.data);
+        console.log('Catalog fetched successfully.');
+      } else {
+        console.error('Failed to fetch catalog.');
+      }
+    } catch (error) {
+      console.error('Error fetching catalog:', error);
+    }
+  }, [URL]);
+
   useEffect(() => {
     if (isLoggedIn) {
       getProduct();
-      getCatalog();
+      getBlogs()
     }
-  }, [isLoggedIn, getProduct, getCatalog]);
+    getCatalog();
+
+  }, [isLoggedIn, getProduct, getCatalog, getBlogs]);
 
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -135,8 +181,85 @@ const App = () => {
   const handleLogout = () => {
     console.log('Logging out');
     localStorage.removeItem('authToken');
+    localStorage.removeItem('userId')
+    localStorage.removeItem("role")
     setIsLoggedIn(false);
+    setUserId(null)
+    setRole(null)
   };
+
+  const createBlog = async (newBlog) => {
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`,
+      };
+      console.log('Creating Blog with headers:', headers);
+      const response = await fetch(`${URL}/api/blogs`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(newBlog),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Blog created successfully.', data);
+        getBlogs();
+        return true;
+      } else {
+        console.error('Failed to create blog.', response);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error creating product:', error);
+      return false;
+    }
+  };
+
+  const updateBlog = async (blog, id) => {
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`,
+      };
+      console.log('Updating Product with headers:', headers);
+      const response = await fetch(`${URL}/api/blogs/${id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(blog),
+      });
+      if (response.ok) {
+        console.log('Blog updated successfully.');
+        getBlogs();
+      } else {
+        console.error('Failed to update blog:', response.statusText);
+        throw new Error(`Failed to update blog with status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error updating blog:', error.message);
+    }
+  };
+
+  const deleteBlog = async (id) => {
+    try {
+      const headers = {
+        'Authorization': `Bearer ${getToken()}`,
+      };
+      console.log('Deleting blog with headers:', headers);
+      const response = await fetch(`${URL}/api/blogs/${id}`, {
+        method: 'DELETE',
+        headers,
+      });
+      if (response.ok) {
+        console.log('Blog deleted successfully.');
+        getBlogs();
+      } else {
+        console.error('Failed to delete blog.');
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
+
 
   const createProduct = async (newProduct) => {
     try {
@@ -145,7 +268,7 @@ const App = () => {
         'Authorization': `Bearer ${getToken()}`,
       };
       console.log('Creating Product with headers:', headers);
-      const response = await fetch(`${URL}/Treats`, {
+      const response = await fetch(`${URL}/api/Treats`, {
         method: 'POST',
         headers,
         body: JSON.stringify(newProduct),
@@ -165,6 +288,7 @@ const App = () => {
     }
   };
 
+
   const updateProduct = async (treat, id) => {
     try {
       const headers = {
@@ -172,7 +296,7 @@ const App = () => {
         'Authorization': `Bearer ${getToken()}`,
       };
       console.log('Updating Product with headers:', headers);
-      const response = await fetch(`${URL}/Treats/${id}`, {
+      const response = await fetch(`${URL}/api/Treats/${id}`, {
         method: 'PUT',
         headers,
         body: JSON.stringify(treat),
@@ -195,7 +319,7 @@ const App = () => {
         'Authorization': `Bearer ${getToken()}`,
       };
       console.log('Deleting Product with headers:', headers);
-      const response = await fetch(`${URL}/Treats/${id}`, {
+      const response = await fetch(`${URL}/api/Treats/${id}`, {
         method: 'DELETE',
         headers,
       });
@@ -216,7 +340,7 @@ const App = () => {
         'Authorization': `Bearer ${getToken()}`,
       };
       console.log('Deleting Catalog Item with headers:', headers);
-      const response = await fetch(`${URL}/Catalog/${id}`, {
+      const response = await fetch(`${URL}/api/Catalog/${id}`, {
         method: 'DELETE',
         headers,
       });
@@ -239,7 +363,7 @@ const App = () => {
         'Authorization': `Bearer ${getToken()}`,
       };
       console.log('Selling Product with headers:', headers);
-      const response = await fetch(`${URL}/Treats/sell`, {
+      const response = await fetch(`${URL}/api/Treats/sell`, {
         method: 'POST',
         headers,
         body: JSON.stringify(treat),
@@ -275,7 +399,7 @@ const App = () => {
               <Typography variant="h6" sx={{ flexGrow: 1 }}>
                 Tasty Treat Delights
               </Typography>
-              <Nav isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+              <Nav role={role} isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
             </Toolbar>
           </AppBar>
           <Container className="mt-8">
@@ -287,6 +411,11 @@ const App = () => {
                   <Yourtreats products={products} onDelete={deleteProduct} onSell={sellProduct} />
                 </ProtectedRoute>
               } />
+               <Route path="/blogs" element={
+                <ProtectedRoute isLoggedIn={isLoggedIn}>
+                  <Blogs blogs={blogs} onDelete={deleteBlog}  role={role}/>
+                </ProtectedRoute>
+              } />
               <Route path="/signup" element={<Signup handleSignUp={handleSignUp} />} />
               <Route path="/checkout" element={
                 <ProtectedRoute isLoggedIn={isLoggedIn}>
@@ -295,7 +424,10 @@ const App = () => {
               } />
               <Route path="/product-detail/:id" element={<Productdetails products={products} updateProduct={updateProduct} onDelete={deleteProduct} />} />
               <Route path="/add-product" element={<Productform createProduct={createProduct} />} />
-              <Route path="/product-catalog" element={<Productcatalog products={catalog} onDelete={deleteCatalogItem} onAddToCart={addToCart} />} />
+              <Route path="/add-blog" element={<BlogForm createBlog={createBlog} />} />
+              <Route path="/blog-detail/:id" element={<BlogDetails blogs={blogs} userId={userId} updateBlog={updateBlog} onDelete={deleteProduct} />} />
+
+              <Route path="/product-catalog" element={<Productcatalog role={role} userId={userId} products={catalog} onDelete={deleteCatalogItem} onAddToCart={addToCart} />} />
             </Routes>
           </Container>
         </div>
