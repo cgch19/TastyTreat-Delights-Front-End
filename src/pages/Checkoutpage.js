@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Button } from '@mui/material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Checkoutpage = ({ cart, onRemove, onQuantityChange }) => {
   const [quantities, setQuantities] = useState({});
@@ -29,6 +31,10 @@ const Checkoutpage = ({ cart, onRemove, onQuantityChange }) => {
     });
   };
 
+  const handleBuyNow = () => {
+    toast.success('You have successfully bought the items!');
+  };
+
   const calculateTotal = () => {
     if (!cart || !cart.length) return 0;
     return cart.reduce((sum, item) => {
@@ -40,6 +46,7 @@ const Checkoutpage = ({ cart, onRemove, onQuantityChange }) => {
 
   return (
     <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row">
+      <ToastContainer />
       <div className="lg:w-1/2 lg:pr-8">
         <Typography variant="h3" component="h2" className="text-3xl font-bold mb-4">
           Your Cart
@@ -116,7 +123,11 @@ const Checkoutpage = ({ cart, onRemove, onQuantityChange }) => {
             <input type="checkbox" id="newsletter" className="mr-2" />
             <label htmlFor="newsletter" className="text-sm">Keep me up to date on news and exclusive offers</label>
           </div>
-          <Button className="bg-rose-900 text-white font-bold py-2 px-4 rounded w-full mb-4" variant="contained">
+          <Button
+            className="bg-rose-900 text-white font-bold py-2 px-4 rounded w-full mb-4"
+            variant="contained"
+            onClick={handleBuyNow}
+          >
             Buy Now
           </Button>
         </div>
