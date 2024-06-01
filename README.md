@@ -34,10 +34,10 @@ Welcome to TastyTreat Delights is an online platform that offers a wide selectio
 - Create .env file and set initial REACT_APP_URL=http://localhost:4000/api
 - [Backend GitHub link, click here](https://github.com/cgch19/TastyTreat-Delights-Back-End.git)
 
-### Sign up and Log in to start creating artist and listening to music !
+### Sign up and Log in to start creating blogs and buying treats !
 
 Heroku 
-
+https://tasty-treats-front-end-a12898d71bbe.herokuapp.com/
 
 Trello
 
