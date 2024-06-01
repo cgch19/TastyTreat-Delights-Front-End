@@ -16,7 +16,6 @@ Welcome to TastyTreat Delights is an online platform that offers a wide selectio
 
 - Toastify
 
-- Spotify Api
 
 - MongoDB/ Mongoose
 
