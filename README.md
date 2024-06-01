@@ -48,7 +48,17 @@ https://trello.com/b/QwY92bKU/project-4
 
 - REACT_APP_URL
 
+<img src="assets/Screenshot 2024-05-31 at 5.37.31 PM.png">
 
+<img src="assets/Screenshot 2024-05-31 at 5.37.41 PM.png">
+
+<img src="assets/Screenshot 2024-05-31 at 5.37.50 PM.png">
+
+<img src="assets/Screenshot 2024-05-31 at 5.38.01 PM.png">
+
+<img src="assets/Screenshot 2024-05-31 at 5.39.58 PM.png">
+
+<img src="assets/Screenshot 2024-05-31 at 5.40.38 PM.png">
 
 
 
